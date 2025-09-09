@@ -211,92 +211,79 @@ export default function DriverTable() {
       </div>
 
       {/* Table */}
-      <div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[400px] h-auto rounded-2xl overflow-hidden border border-gray-700">
-        <div className="h-full overflow-y-scroll">
-          <table className="w-full border-collapse">
-            <thead className="bg-gray-800/80 text-gray-100">
-              <tr>
-                <th className="px-6 py-1 text-left border-r border-gray-700">
-                  Phone Number
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  Full Name
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  DOB
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  City
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left border-r border-gray-700">
-                  Created At
-                </th>
-                <th className="px-6 py-3 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDrivers.map((driver, idx) => (
-                <tr
-                  key={idx}
-                  className={
-                    idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"
-                  }
-                >
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.phone_number}
-                  </td>
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.full_name || "-"}
-                  </td>
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.email || "-"}
-                  </td>
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.date_of_birth &&
-                    driver.date_of_birth !== "0000-00-00"
-                      ? driver.date_of_birth
-                      : "-"}
-                  </td>
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.driver_city || "-"}
-                  </td>
-                  <td className="px-6 py-3 border-t border-r border-gray-700">
-                    {driver.status}
-                  </td>
-                  <td className="px-1 py-3 border-t border-r border-gray-700">
-                    {driver.created_at}
-                  </td>
-                  <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
-                    <button
-                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
-                      onClick={() => handleRowClick(driver)}
-                    >
-                      Verify
-                    </button>
-                    <button
-                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
-                      onClick={() => setUploadFolder(driver.phone_number)}
-                    >
-                      Upload
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+<div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[400px] h-auto rounded-2xl overflow-hidden border border-gray-700">
+  <div className="h-full overflow-y-scroll overflow-x-auto">
+    <table className="w-full table-auto border-collapse">
+      <thead className="bg-gray-800/80 text-gray-100">
+        <tr>
+          <th className="px-6 py-1 text-left border-r border-gray-700">
+            Phone Number
+          </th>
+          <th className="px-6 py-3 text-left border-r border-gray-700">
+            Full Name
+          </th>
+          {/* Hide City column on <lg */}
+          <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
+            City
+          </th>
+          <th className="px-6 py-3 text-left border-r border-gray-700">
+            Status
+          </th>
+          {/* Hide Created At column on <lg */}
+          <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
+            Created At
+          </th>
+          <th className="px-6 py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {filteredDrivers.map((driver, idx) => (
+          <tr
+            key={idx}
+            className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
+          >
+            <td className="px-6 py-3 border-t border-r border-gray-700">
+              {driver.phone_number}
+            </td>
+            <td className="px-6 py-3 border-t border-r border-gray-700">
+              {driver.full_name || "-"}
+            </td>
+            {/* Hide City cell on <lg */}
+            <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
+              {driver.driver_city || "-"}
+            </td>
+            <td className="px-6 py-3 border-t border-r border-gray-700">
+              {driver.status}
+            </td>
+            {/* Hide Created At cell on <lg */}
+            <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
+              {driver.created_at}
+            </td>
+            <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
+              <button
+                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
+                onClick={() => handleRowClick(driver)}
+              >
+                Verify
+              </button>
+              <button
+                className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
+                onClick={() => setUploadFolder(driver.phone_number)}
+              >
+                Upload
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>
 
       {/* Driver Modal */}
       {selectedDriver && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-6">
-          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full max-w-6xl flex overflow-hidden">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl w-full  flex overflow-hidden">
             {/* Left: Form */}
             <div className="w-1/2 p-3 overflow-y-auto max-h-[90vh] border-r border-gray-700">
               <div className="flex justify-between mb-4 px-4 pt-4">

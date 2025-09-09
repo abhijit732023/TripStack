@@ -184,7 +184,7 @@ export default function FolderImageTable() {
       </div>
 
       {/* Table */}
-   <div className="bg-white/10 h-[370px] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
+<div className="bg-white/10 h-[370px] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
   {/* Table header */}
   <table className="w-full border-collapse table-fixed">
     <thead className="bg-gray-800/80 text-gray-100 sticky top-0 z-10">
@@ -195,13 +195,14 @@ export default function FolderImageTable() {
         <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
           Vehicle No
         </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[150px] truncate">
+        {/* Hide on small, show from lg */}
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[150px] truncate hidden lg:table-cell">
           Vehicle Name
         </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate hidden lg:table-cell">
           Fuel Type
         </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[140px] truncate">
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[140px] truncate hidden lg:table-cell">
           RC No
         </th>
         <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
@@ -212,10 +213,10 @@ export default function FolderImageTable() {
         </th>
       </tr>
     </thead>
-
-    {/* Scrollable body */}
   </table>
-  <div className="max-h-[300px] overflow-y-auto">
+
+  {/* Scrollable body */}
+  <div className="max-h-full overflow-y-auto">
     <table className="w-full border-collapse table-fixed">
       <tbody>
         {filteredFolders.map((folder, idx) => {
@@ -231,13 +232,14 @@ export default function FolderImageTable() {
               <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
                 {car.vehicle_number}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              {/* Hide below lg */}
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.vehicle_name}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.fuel_type}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.rc_no}
               </td>
               <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
@@ -264,6 +266,7 @@ export default function FolderImageTable() {
     </table>
   </div>
 </div>
+
 
 
       {/* Modal: form + images */}
