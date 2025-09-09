@@ -1,0 +1,58 @@
+@import "tailwindcss";
+/* tailwind.css */
+@import "leaflet/dist/leaflet.css";
+
+.form-label {
+  @apply font-medium text-gray-700;
+}
+.form-input {
+  @apply mt-1 border rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-300;
+}
+/* Hide scrollbar but keep scroll functionality */
+.invisible-scrollbar {
+  overflow: auto;               /* allow scroll */
+  -ms-overflow-style: none;     /* IE and Edge */
+  scrollbar-width: none;        /* Firefox */
+}
+
+::-webkit-scrollbar {
+  display: none;                /* Chrome, Safari, Opera */
+}
+/* calendar.css */
+.react-calendar {
+  border: none !important;
+  background: white !important;
+  font-family: 'Inter', sans-serif;
+}
+
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151; /* slate-700 */
+}
+
+.react-calendar__tile {
+  padding: 8px 0;
+  font-size: 14px;
+  color: #374151;
+  border-radius: 9999px; /* fully rounded */
+}
+
+.react-calendar__tile--now {
+  background: transparent !important;
+  border: 1px solid #cbd5e1; /* slate-300 */
+}
+
+.react-calendar__tile--active {
+  background: #9333ea !important; /* purple-600 */
+  color: white !important;
+  border-radius: 9999px;
+}
+
+.react-calendar__month-view__weekdays {
+  text-transform: uppercase;
+  font-size: 12px;
+  color: #94a3b8; /* slate-400 */
+}
