@@ -44,6 +44,8 @@ export default function DriverTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [uploadFolder, setUploadFolder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 15;
 
   // Mapping field names → file keywords
   const fieldFileMap = {
@@ -99,6 +101,9 @@ export default function DriverTable() {
   const filteredDrivers = drivers.filter((driver) =>
     driver.phone_number.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  const totalPages = Math.ceil(filteredDrivers.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const currentData = filteredDrivers.slice(startIndex, startIndex + rowsPerPage);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -237,7 +242,7 @@ export default function DriverTable() {
         </tr>
       </thead>
       <tbody>
-        {filteredDrivers.map((driver, idx) => (
+        {currentData.map((driver, idx) => (
           <tr
             key={idx}
             className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
@@ -278,7 +283,59 @@ export default function DriverTable() {
       </tbody>
     </table>
   </div>
+  
 </div>
+<div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
+  {/* Prev */}
+  <button
+    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    Prev
+  </button>
+
+  {/* Page numbers */}
+  {Array.from({ length: totalPages }, (_, i) => i + 1)
+    .filter((page) => {
+      if (page === 1) return true; // Always show first
+      if (page === totalPages) return true; // Always show last
+      if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
+      return false;
+    })
+    .map((page, i, arr) => {
+      const prevPage = arr[i - 1];
+      return (
+        <React.Fragment key={page}>
+          {/* Ellipsis if gap */}
+          {prevPage && page - prevPage > 1 && (
+            <span className="px-2 text-gray-400">...</span>
+          )}
+
+          <button
+            className={`px-3 py-1 rounded-lg ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </button>
+        </React.Fragment>
+      );
+    })}
+
+  {/* Next */}
+  <button
+    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    Next
+  </button>
+</div>
+
 
       {/* Driver Modal */}
       {selectedDriver && (

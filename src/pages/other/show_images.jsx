@@ -45,6 +45,9 @@ export default function FolderImageTable() {
   const [uploadFolder, setUploadFolder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 15;
+
 
   const imageRefs = useRef({});
 
@@ -103,6 +106,10 @@ export default function FolderImageTable() {
   const filteredFolders = folders.filter((folder) =>
     folder.folder.toLowerCase().includes(searchTerm.toLowerCase())
   );
+    const totalPages = Math.ceil(filteredFolders.length / rowsPerPage);
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const currentData = filteredFolders.slice(startIndex, startIndex + rowsPerPage);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -184,7 +191,7 @@ export default function FolderImageTable() {
       </div>
 
       {/* Table */}
-<div className="bg-white/10 h-[370px] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
+<div className="bg-white/10 h-[60vh] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
   {/* Table header */}
   <table className="w-full border-collapse table-fixed">
     <thead className="bg-gray-800/80 text-gray-100 sticky top-0 z-10">
@@ -219,33 +226,33 @@ export default function FolderImageTable() {
   <div className="max-h-full overflow-y-auto">
     <table className="w-full border-collapse table-fixed">
       <tbody>
-        {filteredFolders.map((folder, idx) => {
+        {currentData.map((folder, idx) => {
           const car = folder.car;
           return (
             <tr
               key={idx}
               className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
             >
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
                 {folder.folder}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
                 {car.vehicle_number}
               </td>
               {/* Hide below lg */}
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+              <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.vehicle_name}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+              <td className="px-6py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.fuel_type}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+              <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
                 {car.rc_no}
               </td>
-              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
                 {car.status}
               </td>
-              <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
+              <td className="px-6 py-2 border-t border-gray-700 flex gap-2 justify-center">
                 <button
                   className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
                   onClick={() => handleRowClick(folder)}
@@ -266,6 +273,58 @@ export default function FolderImageTable() {
     </table>
   </div>
 </div>
+     <div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
+  {/* Prev */}
+  <button
+    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+    disabled={currentPage === 1}
+    onClick={() => setCurrentPage((p) => p - 1)}
+  >
+    Prev
+  </button>
+
+  {/* Page numbers */}
+  {Array.from({ length: totalPages }, (_, i) => i + 1)
+    .filter((page) => {
+      if (page === 1) return true; // Always show first
+      if (page === totalPages) return true; // Always show last
+      if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
+      return false;
+    })
+    .map((page, i, arr) => {
+      const prevPage = arr[i - 1];
+      return (
+        <React.Fragment key={page}>
+          {/* Ellipsis if gap */}
+          {prevPage && page - prevPage > 1 && (
+            <span className="px-2 text-gray-400">...</span>
+          )}
+
+          <button
+            className={`px-3 py-1 rounded-lg ${
+              currentPage === page
+                ? "bg-blue-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
+            onClick={() => setCurrentPage(page)}
+          >
+            {page}
+          </button>
+        </React.Fragment>
+      );
+    })}
+
+  {/* Next */}
+  <button
+    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+    disabled={currentPage === totalPages}
+    onClick={() => setCurrentPage((p) => p + 1)}
+  >
+    Next
+  </button>
+</div>
+
+
 
 
 
@@ -423,7 +482,7 @@ export default function FolderImageTable() {
                       <li
                         key={file}
                         onClick={() => setPreviewImage(fileUrl)}
-                        className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 transition"
+                        className="px-4 py-2 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 transition"
                       >
                         <FileText size={18} className="text-gray-400" />
                         <span className="text-gray-200 text-sm truncate">
