@@ -6,6 +6,7 @@ import { User, Phone, Home } from "lucide-react";
 export default function PassengerForm() {
   const [customers, setCustomers] = useState([]);
   const [selectedCustId, setSelectedCustId] = useState("");
+
   const {
     register,
     handleSubmit,
@@ -13,28 +14,42 @@ export default function PassengerForm() {
     formState: { errors, isSubmitting },
   } = useForm();
 
+  // Fetch customers safely
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const { data } = await axios.get(
           "https://www.agnicarrental.com/agni_event_duty/cust_com_form.php"
         );
-        setCustomers(data || []);
+        
+        // Ensure customers is always an array
+        const customersArray = Array.isArray(data)
+          ? data
+          : Array.isArray(data.customers)
+          ? data.customers
+          : [];
+
+        setCustomers(customersArray);
       } catch (error) {
         console.error("Error fetching customers:", error);
+        setCustomers([]);
       }
     };
+
     fetchCustomers();
   }, []);
 
+  // Handle form submission
   const onSubmit = async (formData) => {
     formData.customer_id = selectedCustId;
+
     try {
       const { data } = await axios.post(
         "https://www.agnicarrental.com/agni_event_duty/passenger_form.php",
         formData,
         { headers: { "Content-Type": "application/json" } }
       );
+
       alert(data.message || "✅ Passenger saved successfully!");
       reset();
       setSelectedCustId("");
@@ -48,7 +63,7 @@ export default function PassengerForm() {
     "w-full pl-10 pr-4 py-2 rounded-lg bg-white/90 border border-blue-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-400 shadow-sm";
 
   return (
-    <div className="min-h-auto flex items-center justify-center bg-gradient-to-br from-white via-sky-50 to-sky-100 p-6">
+    <div className="min-h-full flex items-center justify-center bg-gradient-to-br from-white via-sky-50 to-sky-100 p-6">
       <div className="bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl w-full max-w-md p-6 border border-sky-200">
         {/* Title */}
         <h2 className="text-2xl font-bold mb-6 text-center bg-gradient-to-r from-sky-400 to-sky-600 bg-clip-text text-transparent drop-shadow">
@@ -117,10 +132,13 @@ export default function PassengerForm() {
                 required: "Customer is required",
               })}
               value={
-                customers.find((c) => c.id === selectedCustId)?.cust_com_name ||
-                ""
+                Array.isArray(customers)
+                  ? customers.find((c) => c.id === selectedCustId)
+                      ?.cust_com_name || ""
+                  : ""
               }
               onChange={(e) => {
+                if (!Array.isArray(customers)) return;
                 const selected = customers.find(
                   (c) => c.cust_com_name === e.target.value
                 );
@@ -133,11 +151,12 @@ export default function PassengerForm() {
               <option value="" disabled>
                 Select Customer
               </option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.cust_com_name}>
-                  {c.cust_com_name}
-                </option>
-              ))}
+              {Array.isArray(customers) &&
+                customers.map((c) => (
+                  <option key={c.id} value={c.cust_com_name}>
+                    {c.cust_com_name}
+                  </option>
+                ))}
             </select>
           </div>
           {errors.customer_name && (

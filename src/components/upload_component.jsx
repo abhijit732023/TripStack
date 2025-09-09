@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
+import { useDropzone } from "react-dropzone";
 
 const docTypes = [
   "Aadhar",
@@ -20,11 +21,20 @@ export default function FolderDocumentUploader({ folder, onClose }) {
     setFiles((prev) => ({ ...prev, [type]: e.target.files[0] }));
   };
 
+  const handleDrop = useCallback(
+    (acceptedFiles, type) => {
+      if (acceptedFiles.length) {
+        setFiles((prev) => ({ ...prev, [type]: acceptedFiles[0] }));
+      }
+    },
+    [setFiles]
+  );
+
   const handleUpload = async () => {
     if (!folder) return alert("No folder selected!");
 
     const formData = new FormData();
-    formData.append("folderName", folder); // owner_id as folder
+    formData.append("folderName", folder);
 
     for (let type of docTypes) {
       if (files[type]) formData.append(type, files[type]);
@@ -57,22 +67,43 @@ export default function FolderDocumentUploader({ folder, onClose }) {
         </button>
 
         {/* File Inputs Grid */}
-        <div className="grid grid-cols-4 gap-6">
-          {docTypes.map((type) => (
-            <div key={type} className="flex flex-col">
-              <label className="font-semibold mb-2">{type}:</label>
-              <input
-                type="file"
-                onChange={(e) => handleFileChange(e, type)}
-                className={`w-full border rounded-xl px-3 py-2 bg-gray-800 text-gray-200 cursor-pointer transition ${
-                  files[type] ? "border-green-500 bg-green-900" : "border-gray-600"
-                }`}
-              />
-              {files[type] && (
-                <span className="text-green-500 text-sm mt-1">Selected ✅</span>
-              )}
-            </div>
-          ))}
+        <div className="grid grid-cols-3 gap-6">
+          {docTypes.map((type) => {
+            const { getRootProps, getInputProps, isDragActive } = useDropzone({
+              onDrop: (acceptedFiles) => handleDrop(acceptedFiles, type),
+              multiple: false,
+            });
+
+            return (
+              <div key={type} className="flex flex-col">
+                <label className="font-semibold mb-2">{type}:</label>
+
+                <div
+                  {...getRootProps()}
+                  className={`w-full h-16 flex items-center justify-center border-2 rounded-xl cursor-pointer transition ${
+                    isDragActive
+                      ? "border-blue-400 bg-blue-900"
+                      : files[type]
+                      ? "border-green-500 bg-green-900"
+                      : "border-gray-600 bg-gray-800"
+                  }`}
+                >
+                  <input {...getInputProps()} />
+                  <span className="text-gray-200 text-sm">
+                    {files[type]
+                      ? files[type].name
+                      : isDragActive
+                      ? "Drop here..."
+                      : "Drag & drop or click"}
+                  </span>
+                </div>
+
+                {files[type] && (
+                  <span className="text-green-500 text-sm mt-1">Selected ✅</span>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Upload Button */}

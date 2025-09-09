@@ -125,8 +125,6 @@ function DestinationLocalForm() {
 
   return (
     <div className="min-h-full w-full bg-green-50 sm:px-20 py-4">
-      {/* BookingExtractor sends data to setBookingData */}
-      <BookingExtractor onExtract={setBookingData} />
 
       <form
         onSubmit={handleSubmit(onSubmit)}

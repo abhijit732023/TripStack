@@ -68,7 +68,6 @@ export default function FolderImageTable() {
   // section → keyword mapping
   const sectionFileMap = {
     "RC Details": "rc",
-    "Insurance & Permits": "insurance", // default insurance when section clicked
     "Fitness Certificate": "fitness",
   };
 
@@ -80,7 +79,7 @@ export default function FolderImageTable() {
           "https://agnicarrental.com/agni_event_duty/car_details_update.php"
         );
         console.log(res.data);
-        
+
         if (res.data.status === "success") {
           const carFolders = res.data.cardata.map((car) => ({
             folder: car.owner_id,
@@ -161,12 +160,13 @@ export default function FolderImageTable() {
   };
 
   if (loading)
-    return <p className="text-center mt-10 text-lg text-gray-200">Loading cars...</p>;
-  if (error)
-    return <p className="text-center mt-10 text-red-500">{error}</p>;
+    return (
+      <p className="text-center mt-10 text-lg text-gray-200">Loading cars...</p>
+    );
+  if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-900 p-6 text-gray-200">
+    <div className="min-h-full bg-gray-900 p-6 text-gray-200">
       <h2 className="text-3xl font-bold text-center mb-8">All Cars</h2>
 
       {/* Search */}
@@ -184,54 +184,87 @@ export default function FolderImageTable() {
       </div>
 
       {/* Table */}
-      <div className="bg-white/10 backdrop-blur-lg shadow-2xl rounded-2xl overflow-hidden border border-gray-700">
-    <table className="w-full border-collapse">
-  <thead className="bg-gray-800/80 text-gray-100">
-    <tr>
-      <th className="px-6 py-3 text-left border-r border-gray-700">Owner ID</th>
-      <th className="px-6 py-3 text-left border-r border-gray-700">Vehicle No</th>
-      <th className="px-6 py-3 text-left border-r border-gray-700">Vehicle Name</th>
-      <th className="px-6 py-3 text-left border-r border-gray-700">Fuel Type</th>
-      <th className="px-6 py-3 text-left border-r border-gray-700">RC No</th>
-      <th className="px-6 py-3 text-left border-r border-gray-700">Status</th>
-      <th className="px-6 py-3 text-center">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {filteredFolders.map((folder, idx) => {
-      const car = folder.car; // car data from API
-      return (
-        <tr
-          key={idx}
-          className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
-        >
-          <td className="px-6 py-3 border-t border-r border-gray-700">{folder.folder}</td>
-          <td className="px-6 py-3 border-t border-r border-gray-700">{car.vehicle_number}</td>
-          <td className="px-6 py-3 border-t border-r border-gray-700">{car.vehicle_name}</td>
-          <td className="px-6 py-3 border-t border-r border-gray-700">{car.fuel_type}</td>
-          <td className="px-6 py-3 border-t border-r border-gray-700">{car.rc_no}</td>
-          <td className="px-6 py-3 border-t border-r border-gray-700">{car.status}</td>
-          <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
-            <button
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
-              onClick={() => handleRowClick(folder)}
-            >
-              Verify
-            </button>
-            <button
-              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
-              onClick={() => setUploadFolder(folder.folder)}
-            >
-              Upload
-            </button>
-          </td>
-        </tr>
-      );
-    })}
-  </tbody>
-</table>
+   <div className="bg-white/10 h-[370px] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
+  {/* Table header */}
+  <table className="w-full border-collapse table-fixed">
+    <thead className="bg-gray-800/80 text-gray-100 sticky top-0 z-10">
+      <tr>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
+          Owner ID
+        </th>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
+          Vehicle No
+        </th>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[150px] truncate">
+          Vehicle Name
+        </th>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
+          Fuel Type
+        </th>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[140px] truncate">
+          RC No
+        </th>
+        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
+          Status
+        </th>
+        <th className="px-4 py-2 text-center max-w-[120px] truncate">
+          Actions
+        </th>
+      </tr>
+    </thead>
 
-      </div>
+    {/* Scrollable body */}
+  </table>
+  <div className="max-h-[300px] overflow-y-auto">
+    <table className="w-full border-collapse table-fixed">
+      <tbody>
+        {filteredFolders.map((folder, idx) => {
+          const car = folder.car;
+          return (
+            <tr
+              key={idx}
+              className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
+            >
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {folder.folder}
+              </td>
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {car.vehicle_number}
+              </td>
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {car.vehicle_name}
+              </td>
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {car.fuel_type}
+              </td>
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {car.rc_no}
+              </td>
+              <td className="px-6 py-3 border-t border-r border-gray-700 truncate">
+                {car.status}
+              </td>
+              <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
+                <button
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
+                  onClick={() => handleRowClick(folder)}
+                >
+                  Verify
+                </button>
+                <button
+                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
+                  onClick={() => setUploadFolder(folder.folder)}
+                >
+                  Upload
+                </button>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
       {/* Modal: form + images */}
       {selectedFolder && (
@@ -241,35 +274,122 @@ export default function FolderImageTable() {
             <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh] border-r border-gray-700">
               <div className="flex justify-between mb-4">
                 <h3 className="text-xl font-bold">Car Details</h3>
-              
               </div>
               {carData ? (
                 <form onSubmit={handleUpdate} className="space-y-6">
                   {/* RC Section */}
-                  <Section title="RC Details" onClick={() => handleSectionClick("RC Details")}>
-                    <InputField label="RC Number" name="rc_no" value={formState.rc_no} onChange={handleChange} onFocus={() => handleFieldFocus("rc_no")} />
-                    <InputField label="RC Name" name="rc_name" value={formState.rc_name} onChange={handleChange} onFocus={() => handleFieldFocus("rc_name")} />
-                    <InputField label="RC Manufacturing Date" name="rc_manufecture_date" type="date" value={formState.rc_manufecture_date} onChange={handleChange} onFocus={() => handleFieldFocus("rc_manufecture_date")} />
+                  <Section
+                    title="RC Details"
+                    onClick={() => handleSectionClick("RC Details")}
+                  >
+                    <InputField
+                      label="RC Number"
+                      name="rc_no"
+                      value={formState.rc_no}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("rc_no")}
+                    />
+                    <InputField
+                      label="RC Name"
+                      name="rc_name"
+                      value={formState.rc_name}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("rc_name")}
+                    />
+                    <InputField
+                      label="RC Manufacturing Date"
+                      name="rc_manufecture_date"
+                      type="date"
+                      value={formState.rc_manufecture_date}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("rc_manufecture_date")}
+                    />
                   </Section>
 
                   {/* Insurance & Permits */}
-                  <Section title="Insurance & Permits" onClick={() => handleSectionClick("Insurance & Permits")}>
-                    <InputField label="Insurance Number" name="insurance_number" value={formState.insurance_number} onChange={handleChange} onFocus={() => handleFieldFocus("insurance_number")} />
-                    <InputField label="Insurance DOE" name="insurance_doe" type="date" value={formState.insurance_doe} onChange={handleChange} onFocus={() => handleFieldFocus("insurance_doe")} />
-                    <InputField label="PUC DOI" name="puc_doi" type="date" value={formState.puc_doi} onChange={handleChange} onFocus={() => handleFieldFocus("puc_doi")} />
-                    <InputField label="Taxi Permit No" name="texi_permit_no" value={formState.texi_permit_no} onChange={handleChange} onFocus={() => handleFieldFocus("texi_permit_no")} />
-                    <InputField label="Taxi Permit DOE" name="texi_permit_doe" type="date" value={formState.texi_permit_doe} onChange={handleChange} onFocus={() => handleFieldFocus("texi_permit_doe")} />
+                  <Section
+                    title="Insurance & Permits"
+                    onClick={() => handleSectionClick("Insurance & Permits")}
+                  >
+                    <InputField
+                      label="Insurance Number"
+                      name="insurance_number"
+                      value={formState.insurance_number}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("insurance_number")}
+                    />
+                    <InputField
+                      label="Insurance DOE"
+                      name="insurance_doe"
+                      type="date"
+                      value={formState.insurance_doe}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("insurance_doe")}
+                    />
+                    <InputField
+                      label="PUC DOI"
+                      name="puc_doi"
+                      type="date"
+                      value={formState.puc_doi}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("puc_doi")}
+                    />
+                    <InputField
+                      label="Taxi Permit No"
+                      name="texi_permit_no"
+                      value={formState.texi_permit_no}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("texi_permit_no")}
+                    />
+                    <InputField
+                      label="Taxi Permit DOE"
+                      name="texi_permit_doe"
+                      type="date"
+                      value={formState.texi_permit_doe}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("texi_permit_doe")}
+                    />
                   </Section>
 
                   {/* Fitness */}
-                  <Section title="Fitness Certificate" onClick={() => handleSectionClick("Fitness Certificate")}>
-                    <InputField label="Certificate Number" name="fitness_certificate_no" value={formState.fitness_certificate_no} onChange={handleChange} onFocus={() => handleFieldFocus("fitness_certificate_no")} />
-                    <InputField label="Certificate DOI" name="fitness_certificate_doi" type="date" value={formState.fitness_certificate_doi} onChange={handleChange} onFocus={() => handleFieldFocus("fitness_certificate_doi")} />
-                    <InputField label="Certificate DOE" name="fitness_certificate_doe" type="date" value={formState.fitness_certificate_doe} onChange={handleChange} onFocus={() => handleFieldFocus("fitness_certificate_doe")} />
+                  <Section
+                    title="Fitness Certificate"
+                    onClick={() => handleSectionClick("Fitness Certificate")}
+                  >
+                    <InputField
+                      label="Certificate Number"
+                      name="fitness_certificate_no"
+                      value={formState.fitness_certificate_no}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("fitness_certificate_no")}
+                    />
+                    <InputField
+                      label="Certificate DOI"
+                      name="fitness_certificate_doi"
+                      type="date"
+                      value={formState.fitness_certificate_doi}
+                      onChange={handleChange}
+                      onFocus={() =>
+                        handleFieldFocus("fitness_certificate_doi")
+                      }
+                    />
+                    <InputField
+                      label="Certificate DOE"
+                      name="fitness_certificate_doe"
+                      type="date"
+                      value={formState.fitness_certificate_doe}
+                      onChange={handleChange}
+                      onFocus={() =>
+                        handleFieldFocus("fitness_certificate_doe")
+                      }
+                    />
                   </Section>
 
                   <div className="pt-4">
-                    <button type="submit" className="w-full bg-green-700 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-semibold transition">
+                    <button
+                      type="submit"
+                      className="w-full bg-green-700 hover:bg-green-600 text-white py-2 px-4 rounded-lg font-semibold transition"
+                    >
                       Update
                     </button>
                   </div>
@@ -281,14 +401,17 @@ export default function FolderImageTable() {
 
             {/* Right: images */}
             <div className="w-1/2 p-6 overflow-y-auto max-h-[90vh]">
-             <div className="flex justify-between items-center mb-4 ">
-               <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
-                <Folder size={18} /> {selectedFolder.folder} Documents
-              </h3>
-                <button onClick={closeModal} className="px-2 py-2 bg-gray-700 rounded-full hover:bg-gray-600">
+              <div className="flex justify-between items-center mb-4 ">
+                <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                  <Folder size={18} /> {selectedFolder.folder} Documents
+                </h3>
+                <button
+                  onClick={closeModal}
+                  className="px-2 py-2 bg-gray-700 rounded-full hover:bg-gray-600"
+                >
                   <X size={20} />
                 </button>
-             </div>
+              </div>
               {selectedFolder.files && selectedFolder.files.length > 0 ? (
                 <ul className="divide-y divide-gray-700">
                   {selectedFolder.files.map((file) => {
@@ -300,7 +423,9 @@ export default function FolderImageTable() {
                         className="px-4 py-3 flex items-center gap-3 cursor-pointer hover:bg-gray-800/50 transition"
                       >
                         <FileText size={18} className="text-gray-400" />
-                        <span className="text-gray-200 text-sm truncate">{file}</span>
+                        <span className="text-gray-200 text-sm truncate">
+                          {file}
+                        </span>
                       </li>
                     );
                   })}
@@ -317,8 +442,15 @@ export default function FolderImageTable() {
       {previewImage && (
         <div className="fixed top-0 bottom-0 right-0 z-50 flex w-[50vw] items-center justify-center bg-black/80 p-4">
           <div className="relative w-auto h-full flex items-center justify-center rounded-sm">
-            <img src={previewImage} alt="Preview" className="w-full h-[60vh] object-contain rounded-2xl" />
-            <button onClick={() => setPreviewImage(null)} className="absolute top-3 right-3 p-2 bg-gray-800 text-white rounded-full hover:bg-gray-600 transition">
+            <img
+              src={previewImage}
+              alt="Preview"
+              className="w-full h-[60vh] object-contain rounded-2xl"
+            />
+            <button
+              onClick={() => setPreviewImage(null)}
+              className="absolute top-3 right-3 p-2 bg-gray-800 text-white rounded-full hover:bg-gray-600 transition"
+            >
               <X size={20} />
             </button>
           </div>
@@ -326,7 +458,12 @@ export default function FolderImageTable() {
       )}
 
       {/* Upload Modal */}
-      {uploadFolder && <FolderDocumentUploader folder={uploadFolder} onClose={() => setUploadFolder(null)} />}
+      {uploadFolder && (
+        <FolderDocumentUploader
+          folder={uploadFolder}
+          onClose={() => setUploadFolder(null)}
+        />
+      )}
     </div>
   );
 }

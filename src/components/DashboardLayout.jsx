@@ -132,7 +132,7 @@ export default function DashboardLayout({ title }) {
           </div>
 
           {/* Navigation (all navlinks will be visible via scroll) */}
-        
+
           <nav className="mt-4 flex flex-col gap-1">
             {/* Dashboard */}
             <NavLink
@@ -400,7 +400,8 @@ export default function DashboardLayout({ title }) {
                     </div>
                   </div>
                   {/* WhatsApp/Telegram Booking */}
-                  <NavLink
+                </div>
+                 <NavLink
                     to="/whatsapp-booking"
                     className={({ isActive }) =>
                       `px-3 py-2 text-sm hover:bg-blue-600 rounded ${
@@ -410,34 +411,28 @@ export default function DashboardLayout({ title }) {
                   >
                     WhatsApp/Tel Booking
                   </NavLink>
-                   <NavLink
-                    to="/driver-details"
-                    className={({ isActive }) =>
-                      `px-3 py-2 text-sm hover:bg-blue-600 rounded ${
-                        isActive ? "bg-blue-800" : ""
-                      }`
-                    }
-                  >
-                    Driver Details
-                  </NavLink>
-                  <NavLink
-                    to="/car-details"
-                    className={({ isActive }) =>
-                      `px-3 py-2 text-sm hover:bg-blue-600 rounded ${
-                        isActive ? "bg-blue-800" : ""
-                      }`
-                    }
-                  >
-                    Car Details
-                  </NavLink>
-                
-                </div>
-                
-                 
-             
-                  
+                   
               </div>
-              
+              <NavLink
+                to="/driver-details"
+                className={({ isActive }) =>
+                  `px-3 py-2 text-sm hover:bg-blue-600 rounded ${
+                    isActive ? "bg-blue-800" : ""
+                  }`
+                }
+              >
+                Driver Details
+              </NavLink>
+              <NavLink
+                to="/car-details"
+                className={({ isActive }) =>
+                  `px-3 py-2 text-sm hover:bg-blue-600 rounded ${
+                    isActive ? "bg-blue-800" : ""
+                  }`
+                }
+              >
+                Car Details
+              </NavLink>
             </div>
           </nav>
         </div>

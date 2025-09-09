@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Search, X, FileText } from "lucide-react";
-
+import FolderDocumentUploader from "../../components/upload_component";
 /* Section wrapper */
 function Section({ title, children, onClick }) {
   return (
@@ -43,6 +43,7 @@ export default function DriverTable() {
   const [uploadDriver, setUploadDriver] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [uploadFolder, setUploadFolder] = useState(null);
 
   // Mapping field names → file keywords
   const fieldFileMap = {
@@ -197,11 +198,11 @@ export default function DriverTable() {
 
       {/* Search */}
       <div className="mb-6 flex justify-center">
-        <div className="relative w-full max-w-full sm:max-w-7xl">
+        <div className="relative w-full max-w-lg">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
           <input
             type="text"
-            placeholder="Search by phone number..."
+            placeholder="Search by owner ID..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 border border-gray-600 rounded-2xl px-4 py-2 bg-white/10 text-gray-100 placeholder-gray-400"
@@ -210,7 +211,7 @@ export default function DriverTable() {
       </div>
 
       {/* Table */}
-      <div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[480px] h-auto rounded-2xl overflow-hidden border border-gray-700">
+      <div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[400px] h-auto rounded-2xl overflow-hidden border border-gray-700">
         <div className="h-full overflow-y-scroll">
           <table className="w-full border-collapse">
             <thead className="bg-gray-800/80 text-gray-100">
@@ -280,7 +281,7 @@ export default function DriverTable() {
                     </button>
                     <button
                       className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
-                      onClick={() => setUploadDriver(driver.phone_number)}
+                      onClick={() => setUploadFolder(driver.phone_number)}
                     >
                       Upload
                     </button>
@@ -508,6 +509,12 @@ export default function DriverTable() {
             </button>
           </div>
         </div>
+      )}
+      {uploadFolder && (
+        <FolderDocumentUploader
+          folder={uploadFolder}
+          onClose={() => setUploadFolder(null)}
+        />
       )}
     </div>
   );

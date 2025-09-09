@@ -26,7 +26,7 @@ export default function CustomerForm() {
   };
 
   return (
-    <div className="flex justify-center items-start min-h-auto bg-[url('https://img.freepik.com/free-vector/abstract-background-design_1048-6729.jpg')] bg-cover bg-center p-4">
+    <div className="flex justify-center items-center min-h-full bg-[url('https://img.freepik.com/free-vector/abstract-background-design_1048-6729.jpg')] bg-cover bg-center p-4">
       <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
         {/* Title */}
         <h2 className="text-2xl font-bold text-center  text-gray-700">
