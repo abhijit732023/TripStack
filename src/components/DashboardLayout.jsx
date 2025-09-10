@@ -401,6 +401,9 @@ export default function DashboardLayout({ title }) {
                   </div>
                   {/* WhatsApp/Telegram Booking */}
                 </div>
+              
+                   
+              </div>
                  <NavLink
                     to="/whatsapp-booking"
                     className={({ isActive }) =>
@@ -411,8 +414,6 @@ export default function DashboardLayout({ title }) {
                   >
                     WhatsApp/Tel Booking
                   </NavLink>
-                   
-              </div>
               <NavLink
                 to="/driver-details"
                 className={({ isActive }) =>

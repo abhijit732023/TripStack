@@ -21,20 +21,103 @@ export default function BookingForm({ senderPhone }) {
   const [popupVisible, setPopupVisible] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [sourceLang, setSourceLang] = useState("mr");
-
-  // Selection menu state
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [selectedText, setSelectedText] = useState("");
   const menuRef = useRef(null);
+  const [todayCount, setTodayCount] = useState(0);
+  const [trips, setTrips] = useState([]);
+
+
+  // 🚨 Duplicate check state
+  const [duplicateWarning, setDuplicateWarning] = useState(null);
 
   const pickupLocation = watch("pickup_location");
+  const mobileNumber = watch("mobile_number");
+  const fromDate = watch("from_date");
+const [currentPage, setCurrentPage] = useState(1);
+const rowsPerPage = 15;
+
+// ---------- Pagination logic ----------
+const totalPages = Math.ceil(trips.length / rowsPerPage);
+const currentTrips = trips.slice(
+  (currentPage - 1) * rowsPerPage,
+  currentPage * rowsPerPage
+);
+
+const getPageNumbers = () => {
+  const pageNumbers = [];
+  if (totalPages <= 5) {
+    for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+  } else {
+    pageNumbers.push(1, 2, 3, "...", totalPages);
+  }
+  return pageNumbers;
+};
 
   // ---------------- Google Maps ----------------
   const { isLoaded } = useLoadScript({
     googleMapsApiKey: "AIzaSyCZkOB0WSoPjjdf8gRUj9GcXXJuWvpj5Mo",
     libraries: ["places"],
   });
+const fetchTodayBookings = async () => {
+  try {
+    const res = await axios.get(
+      "https://www.agnicarrental.com/whatsapp_trips/whatsapp_trips.php"
+    );
+
+    if (Array.isArray(res.data.data)) {
+      const today = new Date().toISOString().split("T")[0];
+      const count = res.data.data.filter(
+        (b) => b.pickup_date === today || b.created_at === today
+      ).length;
+      setTodayCount(count);
+
+      // ✅ Save trips to state
+      setTrips(res.data.data);
+    }
+
+    return res.data.data || [];
+  } catch (err) {
+    console.error("Error fetching bookings:", err);
+    return [];
+  }
+};
+
+
+  useEffect(() => {
+    fetchTodayBookings();
+  }, []);
+
+  // ---------------- Duplicate Trip Watcher ----------------
+  useEffect(() => {
+    const checkDuplicate = async () => {
+      if (!mobileNumber || !fromDate) {
+        setDuplicateWarning(null);
+        return;
+      }
+      const bookings = await fetchTodayBookings();
+      const duplicate = bookings.find(
+        (b) =>
+          b.mobile_number?.slice(-10) === mobileNumber.slice(-10) &&
+          b.pickup_date === fromDate
+      );
+      if (duplicate) {
+        console.log("Duplicate found:", duplicate);
+
+        if (duplicate) {
+          console.log("Duplicate found:", duplicate);
+
+          setDuplicateWarning(
+            `⚠️ A trip already exists for\n${mobileNumber}\n${fromDate}\n${duplicate.trip_message}`
+          );
+        }
+      } else {
+        setDuplicateWarning(null);
+      }
+    };
+    checkDuplicate();
+  }, [mobileNumber, fromDate]);
 
   // ---------------- Normalizer ----------------
   const normalizeText = (text) => {
@@ -75,11 +158,20 @@ export default function BookingForm({ senderPhone }) {
   };
 
   const parseMobile = (text) => {
-    const clean = normalizeText(text);
-    const match = clean.match(
-      /(\+91[-\s()]?\d{5}[-\s()]?\d{5}|\+91[-\s()]?\d{10}|\b\d{10}\b|\(\d{3,5}\)\d{5,7})/
-    );
-    return match ? match[0].replace(/[-\s()]/g, "") : "";
+    if (!text) return "";
+
+    // 1. Remove emojis & special chars using your normalizeText
+    let clean = normalizeText(text);
+
+    // 2. Remove everything except digits
+    let digitsOnly = clean.replace(/\D/g, "");
+
+    // 3. If more than 10 digits, take last 10 (common for +91 or formats like 09123456789)
+    if (digitsOnly.length >= 10) {
+      return digitsOnly.slice(-10);
+    }
+
+    return "";
   };
 
   const parsePickupLocation = (text) => {
@@ -123,10 +215,21 @@ export default function BookingForm({ senderPhone }) {
       setTranslatedMessage(translatedText);
       setMessage(translatedText);
     } catch (err) {
-      console.error("Translation error:", err);
       alert("Failed to translate. Try again later.");
     }
     setTranslating(false);
+  };
+  const handleOptionSelect = (option) => {
+    if (!selectedText) return;
+    if (option === "mobile_number") {
+      setValue("mobile_number", selectedText);
+    } else if (option === "pickup_location") {
+      setValue("pickup_location", selectedText);
+    } else if (option === "from_date") {
+      setValue("from_date", parseDate(selectedText));
+    }
+    setMenuVisible(false);
+    setSelectedText("");
   };
 
   // ---------------- Extract details ----------------
@@ -154,43 +257,6 @@ export default function BookingForm({ senderPhone }) {
     Object.keys(newData).forEach((key) => setValue(key, newData[key]));
     if (Object.keys(errors).length > 0) setPopupVisible(true);
   };
-
-  // Selection handler (works on <div>)
-  const handleTextSelection = (e) => {
-    const selection = window.getSelection().toString();
-    if (selection && selection.trim().length > 0) {
-      setSelectedText(selection.trim());
-      setMenuPos({ x: e.clientX, y: e.clientY - 30 });
-      setMenuVisible(true);
-    } else {
-      setMenuVisible(false);
-    }
-  };
-
-  // Option selection
-  const handleOptionSelect = (option) => {
-    if (!selectedText) return;
-    if (option === "mobile_number") {
-      setValue("mobile_number", selectedText);
-    } else if (option === "pickup_location") {
-      setValue("pickup_location", selectedText);
-    } else if (option === "from_date") {
-      setValue("from_date", parseDate(selectedText));
-    }
-    setMenuVisible(false);
-    setSelectedText("");
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setMenuVisible(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const handleUseCurrentDate = (use) => {
     if (use) {
       const today = new Date().toISOString().split("T")[0];
@@ -201,6 +267,17 @@ export default function BookingForm({ senderPhone }) {
       });
     }
     setPopupVisible(false);
+  };
+
+  const handleTextSelection = (e) => {
+    const selection = window.getSelection().toString();
+    if (selection && selection.trim().length > 0) {
+      setSelectedText(selection.trim());
+      setMenuPos({ x: e.clientX, y: e.clientY  });
+      setMenuVisible(true);
+    } else {
+      setMenuVisible(false);
+    }
   };
 
   // ---------------- Submit ----------------
@@ -248,11 +325,24 @@ export default function BookingForm({ senderPhone }) {
 
   // ---------------- UI ----------------
   return (
-    <div className="min-h-full bg-blue-50 flex items-center justify-center p-6 relative">
+    <div className="min-h-full bg-blue-50 flex flex-col items-center justify-center p-6 relative">
       <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-3xl">
         <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">
           WhatsApp Booking Form
         </h2>
+        <p className="text-center text-xl mb-4 text-gray-600">
+          Today's Bookings :
+          <span className="font-semibold text-xl text-blue-600">
+            {todayCount}
+          </span>
+        </p>
+
+        {/* 🚨 Duplicate Warning */}
+        {duplicateWarning && (
+          <div className="bg-red-100 border border-red-500 text-red-900 px-4 py-2 rounded-xl mb-4 whitespace-pre-line">
+            {duplicateWarning}
+          </div>
+        )}
 
         {!isLoaded ? (
           <p className="text-center text-blue-600">Loading Maps...</p>
@@ -508,34 +598,107 @@ export default function BookingForm({ senderPhone }) {
                       />
                     </GoogleMap>
                   </div>
-                )}                                                                                                                                                                                                             
+                )}
 
-               <div className="flex gap-4 w-full">
-                 <button
-                  type="submit"
-                  className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold transition"
-                >
-                  Submit Booking
-                </button>
-                <button
-                  type="submit"
-                  onClick={() => {
-                    reset();
-                    setMessage("");
-                    setTranslatedMessage("");
-                    setExtracted(null);
-                    setFieldErrors({});
-                  }}
-                  className="w-1/2 py-2 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-semibold transition"
-                >
-                  reset
-                </button>
-               </div>
+                <div className="flex gap-4 w-full">
+                  <button
+                    type="submit"
+                    className="w-1/2 py-2 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-semibold transition"
+                  >
+                    Submit Booking
+                  </button>
+                  <button
+                    type="submit"
+                    onClick={() => {
+                      reset();
+                      setMessage("");
+                      setTranslatedMessage("");
+                      setExtracted(null);
+                      setFieldErrors({});
+                    }}
+                    className="w-1/2 py-2 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-semibold transition"
+                  >
+                    reset
+                  </button>
+                </div>
               </form>
             )}
           </>
         )}
+
+        {/* rest of your existing UI stays same ... */}
       </div>
+      {/* 🚖 Trips Table */}
+{/* 🚖 Trips Table */}
+<div className="mt-8 w-full ">
+  <h3 className="text-lg font-semibold text-blue-700 mb-3">All Trips</h3>
+  <div className="overflow-x-auto border rounded-2xl w-full shadow-md">
+    <table className="min-w-full border-collapse">
+      <thead className="bg-gray-100 text-left">
+        <tr>
+          <th className="border px-3 py-2">Sr/No</th>
+          <th className="border px-3 py-2">Trip Message</th>
+          <th className="border px-3 py-2 text-center">Click Counter</th>
+          <th className="border px-3 py-2">Pickup Location</th>
+        </tr>
+      </thead>
+      <tbody>
+        {currentTrips.map((trip, index) => (
+          <tr key={trip.id} className="hover:bg-gray-50">
+            <td className="border px-3 py-2">
+              {(currentPage - 1) * rowsPerPage + index + 1}
+            </td>
+            <td className="border px-3 py-2 max-w-xs truncate">
+              {trip.trip_message}
+            </td>
+            <td className={`border px-3 py-2 text-center font-semibold ${
+              trip.drivers_click_counter > 0
+                ? "bg-green-100 text-green-800"
+                : "bg-red-100 text-red-800"
+            } rounded-lg`}>
+              {trip.drivers_click_counter}
+            </td>
+            <td className="border px-3 py-2">{trip.pickup_location}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  {/* Pagination */}
+  <div className="flex justify-center gap-2 mt-4">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40"
+      disabled={currentPage === 1}
+    >
+      Prev
+    </button>
+
+    {getPageNumbers().map((page, idx) => (
+      <button
+        key={idx}
+        onClick={() => typeof page === "number" && setCurrentPage(page)}
+        className={`px-3 py-1 rounded-lg hover:bg-blue-100 ${
+          page === currentPage ? "bg-blue-500 text-white" : "bg-gray-200"
+        }`}
+        disabled={page === "..."}
+      >
+        {page}
+      </button>
+    ))}
+
+    <button
+      onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+      className="px-3 py-1 bg-gray-200 rounded-lg hover:bg-gray-300 disabled:opacity-40"
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</div>
+
+
     </div>
   );
 }

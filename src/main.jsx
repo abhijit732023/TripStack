@@ -10,7 +10,6 @@ import FolderImageTable from './pages/other/show_images.jsx'
 import DriverTable from './pages/other/user_details.jsx'
 
 
-
 const router = createBrowserRouter(
   [
     {
@@ -44,6 +43,9 @@ const router = createBrowserRouter(
             { path: "/file-upload", element: <DocumentUploader /> },
             { path: "/car-details", element: <FolderImageTable /> },
             { path: "/driver-details", element: <DriverTable /> },
+
+
+
 
 
 
