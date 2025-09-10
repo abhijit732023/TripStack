@@ -39,7 +39,7 @@ export default function FolderImageTable() {
   const [folders, setFolders] = useState([]);
   const [selectedFolder, setSelectedFolder] = useState(null);
   const [carData, setCarData] = useState(null);
-  const [formState, setFormState] = useState({});
+
   const [searchTerm, setSearchTerm] = useState("");
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadFolder, setUploadFolder] = useState(null);
@@ -49,6 +49,28 @@ export default function FolderImageTable() {
   const rowsPerPage = 15;
 
   const imageRefs = useRef({});
+  const [formState, setFormState] = useState({
+    vehicle_number: "",
+    owner_id: "",
+    status: "",
+    vehicle_type: "",
+    fuel_type: "",
+    vehicle_name: "",
+    rc_no: "",
+    rc_name: "",
+    rc_manufecture_date: "",
+    insurance_number: "",
+    insurance_doe: "",
+    puc_doi: "",
+    puc_doe: "",
+    texi_permit_no: "",
+    texi_permit_doi: "",
+    texi_permit_doe: "",
+    fitness_certificate_no: "",
+    fitness_certificate_doi: "",
+    fitness_certificate_doe: "",
+  });
+  const [vehicles, setVehicles] = useState([]);
 
   // field → keyword mapping
   const fieldFileMap = {
@@ -80,7 +102,12 @@ export default function FolderImageTable() {
         const res = await axios.get(
           "https://agnicarrental.com/agni_event_duty/car_details_update.php"
         );
-        console.log(res.data);
+
+        const vehicleRes = await axios.get(
+          "https://www.agnicarrental.com/oluber/get_vehicle_types.php"
+        );
+        setVehicles(vehicleRes.data || []);
+        console.log(vehicleRes.data);
 
         if (res.data.status === "success") {
           const carFolders = res.data.cardata.map((car) => ({
@@ -389,14 +416,25 @@ export default function FolderImageTable() {
                     </div>
 
                     {/* Vehicle Type */}
-                    <InputField
-                      label="Vehicle Type"
-                      name="vehicle_type"
-                      value={formState.vehicle_type}
-                      onChange={handleChange}
-                      onFocus={() => handleFieldFocus("vehicle_type")}
-                    />
-
+                    <div className="flex flex-col">
+                      <label className="font-semibold mb-1">Vehicle Type</label>
+                      <select
+                        name="vehicle_type"
+                        value={formState.vehicle_type}
+                        onChange={handleChange}
+                        onFocus={() => handleFieldFocus("vehicle_type")}
+                        className="border bg-[#4c4c4c] border-gray-300 rounded-lg px-3 py-2"
+                      >
+                        <option className="text-white" value="">
+                          Select Vehicle Type
+                        </option>
+                        {vehicles.map((v, index) => (
+                          <option key={index} value={v.vehicle_type_name}>
+                            {v.vehicle_type_name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     {/* Fuel Type */}
                     <div className="flex flex-col">
                       <label className="font-semibold mb-1">Fuel Type</label>
