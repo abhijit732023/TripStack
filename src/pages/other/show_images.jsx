@@ -54,8 +54,8 @@ export default function FolderImageTable() {
     owner_id: "",
     status: "",
     vehicle_type: "",
-    fuel_type: "",
     vehicle_name: "",
+    fuel_type: "",
     rc_no: "",
     rc_name: "",
     rc_manufecture_date: "",
@@ -401,7 +401,7 @@ export default function FolderImageTable() {
 
                     {/* Status */}
                     <div className="flex flex-col">
-                      <label className="font-semibold mb-1">Status</label>
+                      <label className="text-sm text-gray-400 mb-1">Status</label>
                       <select
                         name="status"
                         value={formState.status}
@@ -417,7 +417,7 @@ export default function FolderImageTable() {
 
                     {/* Vehicle Type */}
                     <div className="flex flex-col">
-                      <label className="font-semibold mb-1">Vehicle Type</label>
+                      <label className="text-sm text-gray-400 mb-1">Vehicle Type</label>
                       <select
                         name="vehicle_type"
                         value={formState.vehicle_type}
@@ -437,7 +437,7 @@ export default function FolderImageTable() {
                     </div>
                     {/* Fuel Type */}
                     <div className="flex flex-col">
-                      <label className="font-semibold mb-1">Fuel Type</label>
+                      <label className="text-sm text-gray-400 mb-1">Fuel Type</label>
                       <select
                         name="fuel_type"
                         value={formState.fuel_type}
@@ -452,6 +452,13 @@ export default function FolderImageTable() {
                         <option value="EV">EV</option>
                       </select>
                     </div>
+                    <InputField
+                      label="Vehicle name"
+                      name="vehicle_name"
+                      value={formState.vehicle_name}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("vehicle_name")}
+                    />
                   </Section>
 
                   {/* RC Section */}
