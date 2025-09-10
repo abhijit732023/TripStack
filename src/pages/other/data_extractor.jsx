@@ -273,7 +273,7 @@ const fetchTodayBookings = async () => {
     const selection = window.getSelection().toString();
     if (selection && selection.trim().length > 0) {
       setSelectedText(selection.trim());
-      setMenuPos({ x: e.clientX, y: e.clientY  });
+      setMenuPos({ x: e.clientX, y: e.clientY-30 });
       setMenuVisible(true);
     } else {
       setMenuVisible(false);

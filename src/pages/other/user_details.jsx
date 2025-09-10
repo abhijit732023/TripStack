@@ -103,7 +103,10 @@ export default function DriverTable() {
   );
   const totalPages = Math.ceil(filteredDrivers.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentData = filteredDrivers.slice(startIndex, startIndex + rowsPerPage);
+  const currentData = filteredDrivers.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -113,9 +116,12 @@ export default function DriverTable() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+      console.log("Submitting form:", formState);
+
       const res = await axios.put(
         "https://agnicarrental.com/agni_event_duty/driver_details_update.php",
-        formState
+        formState,
+        { headers: { "Content-Type": "application/json" } }
       );
       alert(res.data.message || "Updated");
     } catch (err) {
@@ -126,25 +132,32 @@ export default function DriverTable() {
 
   const handleRowClick = async (driver) => {
     try {
-      setSelectedDriver(driver);
-      setFormState(driver);
-
       const driverRes = await axios.get(
         `https://agnicarrental.com/agni_event_duty/driver_details_update.php?phone_number=${driver.phone_number}`
       );
       const driverData = driverRes.data.driver || driver;
 
       const filesRes = await axios.get(
-        `http://localhost:5000/images?owner_id=${driverData.phone_number}`
+        `http://localhost:5000/images?owner_id=${driver.phone_number}`
       );
 
-      setSelectedDriver({
+      // keep driver_id from either original driver or API
+      const driverWithId = {
+        ...driver,
         ...driverData,
+        driver_id: driver.driver_id,
+      };
+
+      setSelectedDriver({
+        ...driverWithId,
         files: filesRes.data.files || [],
       });
+
+      setFormState(driverWithId);
     } catch (err) {
       console.error("Error fetching data:", err);
       setSelectedDriver({ ...driver, files: [] });
+      setFormState(driver); // fallback
     }
   };
 
@@ -216,126 +229,126 @@ export default function DriverTable() {
       </div>
 
       {/* Table */}
-<div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[400px] h-auto rounded-2xl overflow-hidden border border-gray-700">
-  <div className="h-full overflow-y-scroll overflow-x-auto">
-    <table className="w-full table-auto border-collapse">
-      <thead className="bg-gray-800/80 text-gray-100">
-        <tr>
-          <th className="px-6 py-1 text-left border-r border-gray-700">
-            Phone Number
-          </th>
-          <th className="px-6 py-3 text-left border-r border-gray-700">
-            Full Name
-          </th>
-          {/* Hide City column on <lg */}
-          <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
-            City
-          </th>
-          <th className="px-6 py-3 text-left border-r border-gray-700">
-            Status
-          </th>
-          {/* Hide Created At column on <lg */}
-          <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
-            Created At
-          </th>
-          <th className="px-6 py-3 text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentData.map((driver, idx) => (
-          <tr
-            key={idx}
-            className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
-          >
-            <td className="px-6 py-3 border-t border-r border-gray-700">
-              {driver.phone_number}
-            </td>
-            <td className="px-6 py-3 border-t border-r border-gray-700">
-              {driver.full_name || "-"}
-            </td>
-            {/* Hide City cell on <lg */}
-            <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
-              {driver.driver_city || "-"}
-            </td>
-            <td className="px-6 py-3 border-t border-r border-gray-700">
-              {driver.status}
-            </td>
-            {/* Hide Created At cell on <lg */}
-            <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
-              {driver.created_at}
-            </td>
-            <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
-              <button
-                className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
-                onClick={() => handleRowClick(driver)}
-              >
-                Verify
-              </button>
-              <button
-                className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
-                onClick={() => setUploadFolder(driver.phone_number)}
-              >
-                Upload
-              </button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-  
-</div>
-<div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
-  {/* Prev */}
-  <button
-    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((p) => p - 1)}
-  >
-    Prev
-  </button>
+      <div className="bg-white/10 backdrop-blur-lg shadow-2xl sm:h-[400px] h-auto rounded-2xl overflow-hidden border border-gray-700">
+        <div className="h-full overflow-y-scroll overflow-x-auto">
+          <table className="w-full table-auto border-collapse">
+            <thead className="bg-gray-800/80 text-gray-100">
+              <tr>
+                <th className="px-6 py-1 text-left border-r border-gray-700">
+                  Phone Number
+                </th>
+                <th className="px-6 py-3 text-left border-r border-gray-700">
+                  Full Name
+                </th>
+                {/* Hide City column on <lg */}
+                <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
+                  City
+                </th>
+                <th className="px-6 py-3 text-left border-r border-gray-700">
+                  Status
+                </th>
+                {/* Hide Created At column on <lg */}
+                <th className="px-6 py-3 text-left border-r border-gray-700 hidden lg:table-cell">
+                  Created At
+                </th>
+                <th className="px-6 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentData.map((driver, idx) => (
+                <tr
+                  key={idx}
+                  className={
+                    idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"
+                  }
+                >
+                  <td className="px-6 py-3 border-t border-r border-gray-700">
+                    {driver.phone_number}
+                  </td>
+                  <td className="px-6 py-3 border-t border-r border-gray-700">
+                    {driver.full_name || "-"}
+                  </td>
+                  {/* Hide City cell on <lg */}
+                  <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
+                    {driver.driver_city || "-"}
+                  </td>
+                  <td className="px-6 py-3 border-t border-r border-gray-700">
+                    {driver.status}
+                  </td>
+                  {/* Hide Created At cell on <lg */}
+                  <td className="px-6 py-3 border-t border-r border-gray-700 hidden lg:table-cell">
+                    {driver.created_at}
+                  </td>
+                  <td className="px-6 py-3 border-t border-gray-700 flex gap-2 justify-center">
+                    <button
+                      className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
+                      onClick={() => handleRowClick(driver)}
+                    >
+                      Verify
+                    </button>
+                    <button
+                      className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
+                      onClick={() => setUploadFolder(driver.phone_number)}
+                    >
+                      Upload
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
+        {/* Prev */}
+        <button
+          className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+        >
+          Prev
+        </button>
 
-  {/* Page numbers */}
-  {Array.from({ length: totalPages }, (_, i) => i + 1)
-    .filter((page) => {
-      if (page === 1) return true; // Always show first
-      if (page === totalPages) return true; // Always show last
-      if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
-      return false;
-    })
-    .map((page, i, arr) => {
-      const prevPage = arr[i - 1];
-      return (
-        <React.Fragment key={page}>
-          {/* Ellipsis if gap */}
-          {prevPage && page - prevPage > 1 && (
-            <span className="px-2 text-gray-400">...</span>
-          )}
+        {/* Page numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1)
+          .filter((page) => {
+            if (page === 1) return true; // Always show first
+            if (page === totalPages) return true; // Always show last
+            if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
+            return false;
+          })
+          .map((page, i, arr) => {
+            const prevPage = arr[i - 1];
+            return (
+              <React.Fragment key={page}>
+                {/* Ellipsis if gap */}
+                {prevPage && page - prevPage > 1 && (
+                  <span className="px-2 text-gray-400">...</span>
+                )}
 
-          <button
-            className={`px-3 py-1 rounded-lg ${
-              currentPage === page
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </button>
-        </React.Fragment>
-      );
-    })}
+                <button
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              </React.Fragment>
+            );
+          })}
 
-  {/* Next */}
-  <button
-    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((p) => p + 1)}
-  >
-    Next
-  </button>
-</div>
-
+        {/* Next */}
+        <button
+          className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+        >
+          Next
+        </button>
+      </div>
 
       {/* Driver Modal */}
       {selectedDriver && (

@@ -116,10 +116,23 @@ export default function FolderImageTable() {
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUpdate = (e) => {
-    e.preventDefault();
-    console.log("Updated car data:", formState);
-  };
+const handleUpdate = async (e) => {
+  e.preventDefault();
+
+
+
+  try {
+    const res = await axios.put(
+      "https://agnicarrental.com/agni_event_duty/car_details_update.php",
+      formState,
+      { headers: { "Content-Type": "application/json" } }
+    );
+    console.log("Update response:", res.data);
+  } catch (err) {
+    console.error("Update failed:", err);
+  }
+};
+
 
   const handleRowClick = async (folder) => {
     setSelectedFolder(folder);
