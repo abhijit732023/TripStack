@@ -118,12 +118,12 @@ export default function DriverTable() {
     try {
       console.log("Submitting form:", formState);
 
-      const res = await axios.put(
-        "https://agnicarrental.com/agni_event_duty/driver_details_update.php",
-        formState,
-        { headers: { "Content-Type": "application/json" } }
-      );
-      alert(res.data.message || "Updated");
+      // const res = await axios.put(
+      //   "https://agnicarrental.com/agni_event_duty/driver_details_update.php",
+      //   formState,
+      //   { headers: { "Content-Type": "application/json" } }
+      // );
+      // alert(res.data.message || "Updated");
     } catch (err) {
       console.error(err);
       alert("Update failed");
@@ -360,6 +360,7 @@ export default function DriverTable() {
                 <h3 className="text-xl font-bold">Driver Details</h3>
               </div>
               <form onSubmit={handleUpdate} className="space-y-1">
+                
                 {/* Section 1: Personal Info */}
                 <Section
                   title="Personal Info"

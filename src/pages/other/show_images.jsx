@@ -45,9 +45,8 @@ export default function FolderImageTable() {
   const [uploadFolder, setUploadFolder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const rowsPerPage = 15;
-
 
   const imageRefs = useRef({});
 
@@ -106,35 +105,33 @@ export default function FolderImageTable() {
   const filteredFolders = folders.filter((folder) =>
     folder.folder.toLowerCase().includes(searchTerm.toLowerCase())
   );
-    const totalPages = Math.ceil(filteredFolders.length / rowsPerPage);
+  const totalPages = Math.ceil(filteredFolders.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
-  const currentData = filteredFolders.slice(startIndex, startIndex + rowsPerPage);
-
+  const currentData = filteredFolders.slice(
+    startIndex,
+    startIndex + rowsPerPage
+  );
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
   };
 
-const handleUpdate = async (e) => {
-  e.preventDefault();
-  console.log("Submitting form state:", formState);
-  
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    console.log("Submitting form state:", formState);
 
-
-
-  try {
-    const res = await axios.put(
-      "https://agnicarrental.com/agni_event_duty/car_details_update.php",
-      formState,
-      { headers: { "Content-Type": "application/json" } }
-    );
-    console.log("Update response:", res.data);
-  } catch (err) {
-    console.error("Update failed:", err);
-  }
-};
-
+    try {
+      const res = await axios.put(
+        "https://agnicarrental.com/agni_event_duty/car_details_update.php",
+        formState,
+        { headers: { "Content-Type": "application/json" } }
+      );
+      console.log("Update response:", res.data);
+    } catch (err) {
+      console.error("Update failed:", err);
+    }
+  };
 
   const handleRowClick = async (folder) => {
     setSelectedFolder(folder);
@@ -206,142 +203,140 @@ const handleUpdate = async (e) => {
       </div>
 
       {/* Table */}
-<div className="bg-white/10 h-[60vh] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
-  {/* Table header */}
-  <table className="w-full border-collapse table-fixed">
-    <thead className="bg-gray-800/80 text-gray-100 sticky top-0 z-10">
-      <tr>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
-          Owner ID
-        </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
-          Vehicle No
-        </th>
-        {/* Hide on small, show from lg */}
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[150px] truncate hidden lg:table-cell">
-          Vehicle Name
-        </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate hidden lg:table-cell">
-          Fuel Type
-        </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[140px] truncate hidden lg:table-cell">
-          RC No
-        </th>
-        <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
-          Status
-        </th>
-        <th className="px-4 py-2 text-center max-w-[120px] truncate">
-          Actions
-        </th>
-      </tr>
-    </thead>
-  </table>
-
-  {/* Scrollable body */}
-  <div className="max-h-full overflow-y-auto">
-    <table className="w-full border-collapse table-fixed">
-      <tbody>
-        {currentData.map((folder, idx) => {
-          const car = folder.car;
-          return (
-            <tr
-              key={idx}
-              className={idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"}
-            >
-              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
-                {folder.folder}
-              </td>
-              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
-                {car.vehicle_number}
-              </td>
-              {/* Hide below lg */}
-              <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
-                {car.vehicle_name}
-              </td>
-              <td className="px-6py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
-                {car.fuel_type}
-              </td>
-              <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
-                {car.rc_no}
-              </td>
-              <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
-                {car.status}
-              </td>
-              <td className="px-6 py-2 border-t border-gray-700 flex gap-2 justify-center">
-                <button
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
-                  onClick={() => handleRowClick(folder)}
-                >
-                  Verify
-                </button>
-                <button
-                  className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
-                  onClick={() => setUploadFolder(folder.folder)}
-                >
-                  Upload
-                </button>
-              </td>
+      <div className="bg-white/10 h-[60vh] backdrop-blur-lg shadow-2xl rounded-2xl border border-gray-700 overflow-hidden">
+        {/* Table header */}
+        <table className="w-full border-collapse table-fixed">
+          <thead className="bg-gray-800/80 text-gray-100 sticky top-0 z-10">
+            <tr>
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
+                Owner ID
+              </th>
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[120px] truncate">
+                Vehicle No
+              </th>
+              {/* Hide on small, show from lg */}
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[150px] truncate hidden lg:table-cell">
+                Vehicle Name
+              </th>
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate hidden lg:table-cell">
+                Fuel Type
+              </th>
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[140px] truncate hidden lg:table-cell">
+                RC No
+              </th>
+              <th className="px-4 py-2 text-left border-r border-gray-700 max-w-[100px] truncate">
+                Status
+              </th>
+              <th className="px-4 py-2 text-center max-w-[120px] truncate">
+                Actions
+              </th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
-</div>
-     <div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
-  {/* Prev */}
-  <button
-    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
-    disabled={currentPage === 1}
-    onClick={() => setCurrentPage((p) => p - 1)}
-  >
-    Prev
-  </button>
+          </thead>
+        </table>
 
-  {/* Page numbers */}
-  {Array.from({ length: totalPages }, (_, i) => i + 1)
-    .filter((page) => {
-      if (page === 1) return true; // Always show first
-      if (page === totalPages) return true; // Always show last
-      if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
-      return false;
-    })
-    .map((page, i, arr) => {
-      const prevPage = arr[i - 1];
-      return (
-        <React.Fragment key={page}>
-          {/* Ellipsis if gap */}
-          {prevPage && page - prevPage > 1 && (
-            <span className="px-2 text-gray-400">...</span>
-          )}
+        {/* Scrollable body */}
+        <div className="max-h-full overflow-y-auto">
+          <table className="w-full border-collapse table-fixed">
+            <tbody>
+              {currentData.map((folder, idx) => {
+                const car = folder.car;
+                return (
+                  <tr
+                    key={idx}
+                    className={
+                      idx % 2 === 0 ? "bg-gray-900/50" : "bg-gray-800/50"
+                    }
+                  >
+                    <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
+                      {folder.folder}
+                    </td>
+                    <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
+                      {car.vehicle_number}
+                    </td>
+                    {/* Hide below lg */}
+                    <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+                      {car.vehicle_name}
+                    </td>
+                    <td className="px-6py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+                      {car.fuel_type}
+                    </td>
+                    <td className="px-6 py-2 border-t border-r border-gray-700 truncate hidden lg:table-cell">
+                      {car.rc_no}
+                    </td>
+                    <td className="px-6 py-2 border-t border-r border-gray-700 truncate">
+                      {car.status}
+                    </td>
+                    <td className="px-6 py-2 border-t border-gray-700 flex gap-2 justify-center">
+                      <button
+                        className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl"
+                        onClick={() => handleRowClick(folder)}
+                      >
+                        Verify
+                      </button>
+                      <button
+                        className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white rounded-2xl"
+                        onClick={() => setUploadFolder(folder.folder)}
+                      >
+                        Upload
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="flex justify-center items-center gap-2 p-4 bg-gray-900/60 border-t border-gray-700 mt-2 rounded-b-2xl">
+        {/* Prev */}
+        <button
+          className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => p - 1)}
+        >
+          Prev
+        </button>
 
-          <button
-            className={`px-3 py-1 rounded-lg ${
-              currentPage === page
-                ? "bg-blue-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
-            onClick={() => setCurrentPage(page)}
-          >
-            {page}
-          </button>
-        </React.Fragment>
-      );
-    })}
+        {/* Page numbers */}
+        {Array.from({ length: totalPages }, (_, i) => i + 1)
+          .filter((page) => {
+            if (page === 1) return true; // Always show first
+            if (page === totalPages) return true; // Always show last
+            if (page >= currentPage - 1 && page <= currentPage + 1) return true; // Show current -1, current, current+1
+            return false;
+          })
+          .map((page, i, arr) => {
+            const prevPage = arr[i - 1];
+            return (
+              <React.Fragment key={page}>
+                {/* Ellipsis if gap */}
+                {prevPage && page - prevPage > 1 && (
+                  <span className="px-2 text-gray-400">...</span>
+                )}
 
-  {/* Next */}
-  <button
-    className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
-    disabled={currentPage === totalPages}
-    onClick={() => setCurrentPage((p) => p + 1)}
-  >
-    Next
-  </button>
-</div>
+                <button
+                  className={`px-3 py-1 rounded-lg ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                  }`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </button>
+              </React.Fragment>
+            );
+          })}
 
-
-
-
+        {/* Next */}
+        <button
+          className="px-3 py-1 bg-gray-700 text-white rounded-lg disabled:opacity-40"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => p + 1)}
+        >
+          Next
+        </button>
+      </div>
 
       {/* Modal: form + images */}
       {selectedFolder && (
@@ -354,6 +349,73 @@ const handleUpdate = async (e) => {
               </div>
               {carData ? (
                 <form onSubmit={handleUpdate} className="space-y-6">
+                  {/* Section: Vehicle Info */}
+                  <Section
+                    title="Vehicle Info"
+                    onClick={() => handleSectionClick("Vehicle Info")}
+                  >
+                    {/* Vehicle Number */}
+                    <InputField
+                      label="Vehicle Number"
+                      name="vehicle_number"
+                      value={formState.vehicle_number}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("vehicle_number")}
+                    />
+
+                    {/* Owner ID */}
+                    <InputField
+                      label="Owner ID"
+                      name="owner_id"
+                      value={formState.owner_id}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("owner_id")}
+                    />
+
+                    {/* Status */}
+                    <div className="flex flex-col">
+                      <label className="font-semibold mb-1">Status</label>
+                      <select
+                        name="status"
+                        value={formState.status}
+                        onChange={handleChange}
+                        onFocus={() => handleFieldFocus("status")}
+                        className="border bg-[#4c4c4c] border-gray-300 rounded-lg px-3 py-2"
+                      >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Notified">Notified</option>
+                      </select>
+                    </div>
+
+                    {/* Vehicle Type */}
+                    <InputField
+                      label="Vehicle Type"
+                      name="vehicle_type"
+                      value={formState.vehicle_type}
+                      onChange={handleChange}
+                      onFocus={() => handleFieldFocus("vehicle_type")}
+                    />
+
+                    {/* Fuel Type */}
+                    <div className="flex flex-col">
+                      <label className="font-semibold mb-1">Fuel Type</label>
+                      <select
+                        name="fuel_type"
+                        value={formState.fuel_type}
+                        onChange={handleChange}
+                        onFocus={() => handleFieldFocus("fuel_type")}
+                        className="border bg-[#4c4c4c] border-gray-300 rounded-lg px-3 py-2"
+                      >
+                        <option value="Petrol">Petrol</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="CNG">CNG</option>
+                        <option value="Petrol & CNG">Petrol & CNG</option>
+                        <option value="EV">EV</option>
+                      </select>
+                    </div>
+                  </Section>
+
                   {/* RC Section */}
                   <Section
                     title="RC Details"

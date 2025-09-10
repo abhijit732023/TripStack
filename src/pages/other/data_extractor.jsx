@@ -4,13 +4,14 @@ import axios from "axios";
 import * as chrono from "chrono-node";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import LocationInput from "./gmap";
-import { X, Check } from "lucide-react";
+import { X, Check, Trash2 } from "lucide-react";
 
 const mapContainerStyle = { width: "100%", height: "300px" };
 
 export default function BookingForm({ senderPhone }) {
   const tripMessageRef = useRef(null);
   const { register, handleSubmit, setValue, reset, watch } = useForm();
+   const [deletingId, setDeletingId] = useState(null);
 
   // ---------------- States ----------------
   const [loading, setLoading] = useState(false);
@@ -27,6 +28,7 @@ export default function BookingForm({ senderPhone }) {
   const menuRef = useRef(null);
   const [todayCount, setTodayCount] = useState(0);
   const [trips, setTrips] = useState([]);
+  const [online_driver, setOnline_driver] = useState(null);
 
 
   // 🚨 Duplicate check state
@@ -65,6 +67,12 @@ const fetchTodayBookings = async () => {
     const res = await axios.get(
       "https://www.agnicarrental.com/whatsapp_trips/whatsapp_trips.php"
     );
+    console.log('bookings',res.data.data);
+    
+    const onlinedriver = await axios.get('https://www.agnicarrental.com/whatsapp_trips/online_driver_count.php')
+    console.log('online driver',onlinedriver.data.data.length);
+    setOnline_driver(onlinedriver.data.data.length);
+    
 
     if (Array.isArray(res.data.data)) {
       const today = new Date().toISOString().split("T")[0];
@@ -83,6 +91,34 @@ const fetchTodayBookings = async () => {
     return [];
   }
 };
+  const handleDelete = async (trip_id) => {
+    if (!window.confirm("Are you sure you want to delete this trip?")) return;
+
+    try {
+      setDeletingId(trip_id);
+
+      const response = await axios.delete(
+        "https://www.agnicarrental.com/whatsapp_trips/whatsapp_trips.php",
+        {
+          data: { trip_id },
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+
+      if (response.data.success) {
+        alert("Trip deleted successfully ✅");
+        // update parent state
+        onDeleteSuccess(trip_id);
+      } else {
+        alert(response.data.message || "Failed to delete trip ❌");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert("Something went wrong while deleting ❌");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
 
   useEffect(() => {
@@ -330,12 +366,20 @@ const fetchTodayBookings = async () => {
         <h2 className="text-2xl font-bold text-blue-700 mb-6 text-center">
           WhatsApp Booking Form
         </h2>
-        <p className="text-center text-xl mb-4 text-gray-600">
+       <div>
+         <p className="text-center text-xl mb-4 text-gray-600">
           Today's Bookings :
           <span className="font-semibold text-xl text-blue-600">
             {todayCount}
           </span>
         </p>
+         <p className="text-center text-xl mb-4 text-gray-600">
+          Online Driver :
+          <span className="font-semibold text-xl text-blue-600">
+            {online_driver?online_driver:0}
+          </span>
+        </p>
+       </div>
 
         {/* 🚨 Duplicate Warning */}
         {duplicateWarning && (
@@ -633,38 +677,50 @@ const fetchTodayBookings = async () => {
 <div className="mt-8 w-full ">
   <h3 className="text-lg font-semibold text-blue-700 mb-3">All Trips</h3>
   <div className="overflow-x-auto border rounded-2xl w-full shadow-md">
-    <table className="min-w-full border-collapse">
-      <thead className="bg-gray-100 text-left">
-        <tr>
-          <th className="border px-3 py-2">Sr/No</th>
-          <th className="border px-3 py-2">Trip Message</th>
-          <th className="border px-3 py-2 text-center">Click Counter</th>
-          <th className="border px-3 py-2">Pickup Location</th>
-        </tr>
-      </thead>
-      <tbody>
-        {currentTrips.map((trip, index) => (
-          <tr key={trip.id} className="hover:bg-gray-50">
-            <td className="border px-3 py-2">
-              {(currentPage - 1) * rowsPerPage + index + 1}
-            </td>
-            <td className="border px-3 py-2 max-w-xs truncate">
-              {trip.trip_message}
-            </td>
-            <td className={`border px-3 py-2 text-center font-semibold ${
-              trip.drivers_click_counter > 0
-                ? "bg-green-100 text-green-800"
-                : "bg-red-100 text-red-800"
-            } rounded-lg`}>
-              {trip.drivers_click_counter}
-            </td>
-            <td className="border px-3 py-2">{trip.pickup_location}</td>
+      <table className="min-w-full border-collapse">
+        <thead className="bg-gray-100 text-left">
+          <tr>
+            <th className="border px-3 py-2">Sr/No</th>
+            <th className="border px-3 py-2">Trip Message</th>
+            <th className="border px-3 py-2 text-center">Click Counter</th>
+            <th className="border px-3 py-2">Pickup Location</th>
+            <th className="border px-3 py-2 text-center">Action</th>
           </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-
+        </thead>
+        <tbody>
+          {currentTrips.map((trip, index) => (
+            <tr key={trip.id} className="hover:bg-gray-50">
+              <td className="border px-3 py-2">
+                {(currentPage - 1) * rowsPerPage + index + 1}
+              </td>
+              <td className="border px-3 py-2 max-w-xs truncate">
+                {trip.trip_message}
+              </td>
+              <td
+                className={`border px-3 py-2 text-center font-semibold ${
+                  trip.drivers_click_counter > 0
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
+                } rounded-lg`}
+              >
+                {trip.drivers_click_counter}
+              </td>
+              <td className="border px-3 py-2">{trip.pickup_location}</td>
+              <td className="border px-3 py-2 text-center">
+                <button
+                  onClick={() => handleDelete(trip.id)}
+                  disabled={deletingId === trip.id}
+                  className="px-3 py-1 bg-red-600 text-white rounded-md hover:bg-red-700 flex items-center gap-1 mx-auto disabled:opacity-50"
+                >
+                  <Trash2 size={16} />
+                  {deletingId === trip.id ? "Deleting..." : "Delete"}
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   {/* Pagination */}
   <div className="flex justify-center gap-2 mt-4">
     <button
